@@ -1,0 +1,27 @@
+@model kitucxa.Models.Room
+
+@{
+    ViewData["Title"] = "Xóa phòng";
+}
+
+<h2>Xóa phòng</h2>
+
+<h4>Bạn có chắc muốn xóa phòng này không?</h4>
+
+<div class="mb-3">
+    <strong>Id:</strong> @Model.Id
+</div>
+
+<div class="mb-3">
+    <strong>Số phòng:</strong> @Model.RoomNumber
+</div>
+
+<div class="mb-3">
+    <strong>Sức chứa:</strong> @Model.Capacity
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Xóa</button>
+    <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+</form>

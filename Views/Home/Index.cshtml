@@ -1,0 +1,49 @@
+﻿@{
+    ViewData["Title"] = "Trang chủ";
+}
+
+<div class="p-5 mb-4 bg-light rounded-3 shadow-sm">
+    <div class="container-fluid py-4">
+        <h1 class="display-5 fw-bold">KTX Manager</h1>
+        <p class="col-md-8 fs-5">
+            Website quản lý ký túc xá giúp quản lý sinh viên, phòng ở và các ràng buộc nghiệp vụ cơ bản.
+        </p>
+        <a asp-controller="Student" asp-action="Create" class="btn btn-primary btn-lg me-2">
+            Thêm sinh viên
+        </a>
+        <a asp-controller="Room" asp-action="Create" class="btn btn-outline-primary btn-lg">
+            Thêm phòng
+        </a>
+    </div>
+</div>
+
+<div class="row text-center g-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h4 class="card-title">Sinh viên</h4>
+                <p class="card-text">Quản lý thông tin sinh viên và phòng đang ở.</p>
+                <a asp-controller="Student" asp-action="Index" class="btn btn-primary">Xem danh sách</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h4 class="card-title">Phòng</h4>
+                <p class="card-text">Quản lý danh sách phòng và sức chứa từng phòng.</p>
+                <a asp-controller="Room" asp-action="Index" class="btn btn-success">Xem danh sách</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h4 class="card-title">Nghiệp vụ</h4>
+                <p class="card-text">Đã có kiểm tra phòng đầy và không cho xóa phòng đang có sinh viên.</p>
+            </div>
+        </div>
+    </div>
+</div>

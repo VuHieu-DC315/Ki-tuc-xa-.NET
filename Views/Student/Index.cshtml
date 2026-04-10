@@ -1,0 +1,47 @@
+@model List<kitucxa.Models.Student>
+
+<h2>Danh sách sinh viên</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Thêm sinh viên</a>
+</p>
+
+@if (Model == null || Model.Count == 0)
+{
+    <p>Chưa có sinh viên nào.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Họ tên</th>
+                <th>Giới tính</th>
+                <th>Ngày sinh</th>
+                <th>Số điện thoại</th>
+                <th>Phòng</th>
+                <th>ID Phòng</th>
+                <th>Chức năng</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var student in Model)
+        {
+            <tr>
+                <td>@student.Id</td>
+                <td>@student.FullName</td>
+                <td>@student.Gender</td>
+                <td>@student.DateOfBirth.ToShortDateString()</td>
+                <td>@student.PhoneNumber</td>
+                <td>@student.Room?.RoomNumber</td>
+                <td>@student.RoomId</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@student.Id" class="btn btn-warning btn-sm">Sửa</a>
+                    <a asp-action="Delete" asp-route-id="@student.Id" class="btn btn-danger btn-sm">Xóa</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

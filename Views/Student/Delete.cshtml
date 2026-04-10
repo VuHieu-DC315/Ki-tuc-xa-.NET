@@ -1,0 +1,20 @@
+@model kitucxa.Models.Student
+
+<h2>Xóa sinh viên</h2>
+
+<p>Bạn có chắc chắn muốn xóa sinh viên này không?</p>
+
+<div>
+    <p><strong>Id:</strong> @Model.Id</p>
+    <p><strong>Họ tên:</strong> @Model.FullName</p>
+    <p><strong>Giới tính:</strong> @Model.Gender</p>
+    <p><strong>Ngày sinh:</strong> @Model.DateOfBirth.ToShortDateString()</p>
+    <p><strong>Số điện thoại:</strong> @Model.PhoneNumber</p>
+    <p><strong>Phòng:</strong> @Model.RoomId</p>
+</div>
+
+<form asp-action="DeleteConfirmed" method="post">
+    <input type="hidden" name="id" value="@Model.Id" />
+    <button type="submit">Xóa</button>
+    <a asp-action="Index">Hủy</a>
+</form>

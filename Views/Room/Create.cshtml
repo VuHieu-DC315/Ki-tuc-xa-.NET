@@ -1,0 +1,23 @@
+@model kitucxa.Models.Room
+
+<form asp-action="Create" method="post">
+    <div>
+        <label asp-for="RoomNumber"></label>
+        <input asp-for="RoomNumber" />
+        <span asp-validation-for="RoomNumber"></span>
+    </div>
+
+    <div>
+        <label asp-for="Capacity"></label>
+        <input asp-for="Capacity" type="number" />
+        <span asp-validation-for="Capacity"></span>
+    </div>
+
+    <button type="submit">Lưu</button>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

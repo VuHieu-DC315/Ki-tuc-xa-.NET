@@ -1,0 +1,48 @@
+@model kitucxa.Models.Student
+
+<h2>Sửa sinh viên</h2>
+
+<form asp-action="Edit" method="post">
+    <input asp-for="Id" type="hidden" />
+
+    <div>
+        <label asp-for="FullName"></label>
+        <input asp-for="FullName" />
+        <span asp-validation-for="FullName"></span>
+    </div>
+
+    <div>
+        <label asp-for="Gender"></label>
+        <input asp-for="Gender" />
+        <span asp-validation-for="Gender"></span>
+    </div>
+
+    <div>
+        <label asp-for="DateOfBirth"></label>
+        <input asp-for="DateOfBirth" type="date" />
+        <span asp-validation-for="DateOfBirth"></span>
+    </div>
+
+    <div>
+        <label asp-for="PhoneNumber"></label>
+        <input asp-for="PhoneNumber" />
+        <span asp-validation-for="PhoneNumber"></span>
+    </div>
+
+    <div>
+        <label asp-for="RoomId"></label>
+        <select asp-for="RoomId" asp-items="ViewBag.RoomList">
+            <option value="">-- Chọn phòng --</option>
+        </select>
+        <span asp-validation-for="RoomId"></span>
+    </div>
+
+    <button type="submit">Lưu</button>
+    <a asp-action="Index">Quay lại danh sách</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
