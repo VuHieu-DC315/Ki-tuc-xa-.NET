@@ -12,7 +12,7 @@ namespace kitucxa.Models
         [Required(ErrorMessage = "Giới tính không được để trống")]
         public string Gender { get; set; } = string.Empty;
 
-        public DateTime DateOfBirth { get; set; }
+        public DateTime DateOfBirth { get; set; } 
 
         [Required(ErrorMessage = "Số điện thoại không được để trống")]
         public string PhoneNumber { get; set; } = string.Empty;

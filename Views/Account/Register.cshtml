@@ -1,0 +1,48 @@
+@model kitucxa.Models.User
+
+@{
+    ViewData["Title"] = "Đăng ký";
+}
+
+<div class="container mt-5" style="max-width: 550px;">
+    <div class="card shadow">
+        <div class="card-header bg-success text-white text-center">
+            <h3>Đăng ký tài khoản</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Register" method="post">
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label">Tên đăng nhập</label>
+                    <input asp-for="Name" class="form-control" placeholder="Nhập tên đăng nhập" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label">Email</label>
+                    <input asp-for="Email" class="form-control" placeholder="Nhập email" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label">Mật khẩu</label>
+                    <input asp-for="Password" type="password" class="form-control" placeholder="Nhập mật khẩu" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <input type="hidden" asp-for="Role" value="User" />
+
+                <button type="submit" class="btn btn-success w-100">Đăng ký</button>
+            </form>
+
+            <div class="text-center mt-3">
+                <a asp-action="Login">Đã có tài khoản? Đăng nhập</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

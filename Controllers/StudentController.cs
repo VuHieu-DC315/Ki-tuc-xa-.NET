@@ -53,5 +53,62 @@ namespace kitucxa.Controllers
             LoadRooms(student.RoomId);
             return View(student);
         }
+
+        public IActionResult Edit(int id)
+        {
+            var student = _studentService.GetById(id);
+            if (student == null)
+            {
+                return NotFound();
+            }
+
+            LoadRooms(student.RoomId);
+            return View(student);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, Student student)
+        {
+            if (id != student.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _studentService.Update(student);
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (InvalidOperationException ex)
+                {
+                    ModelState.AddModelError("", ex.Message);
+                }
+            }
+
+            LoadRooms(student.RoomId);
+            return View(student);
+        }
+
+        public IActionResult Delete(int id)
+        {
+            var student = _studentService.GetById(id);
+            if (student == null)
+            {
+                return NotFound();
+            }
+
+            return View(student);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            _studentService.Delete(id);
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

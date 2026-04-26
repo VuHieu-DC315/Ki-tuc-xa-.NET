@@ -49,6 +49,32 @@ namespace kitucxa.Service
 
         public void Update(Student student)
         {
+            var existingStudent = _context.Student
+                .AsNoTracking()
+                .FirstOrDefault(s => s.Id == student.Id);
+
+            if (existingStudent == null)
+            {
+                throw new InvalidOperationException("Sinh viên không tồn tại.");
+            }
+
+            var room = _context.Room.Find(student.RoomId);
+
+            if (room == null)
+            {
+                throw new InvalidOperationException("Phòng không tồn tại.");
+            }
+
+            if (existingStudent.RoomId != student.RoomId)
+            {
+                int currentStudentCount = _context.Student.Count(s => s.RoomId == student.RoomId);
+
+                if (currentStudentCount >= room.Capacity)
+                {
+                    throw new InvalidOperationException("Phòng đã đầy, không thể chuyển sinh viên vào phòng này.");
+                }
+            }
+
             _context.Student.Update(student);
             _context.SaveChanges();
         }

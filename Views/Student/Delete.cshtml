@@ -10,10 +10,11 @@
     <p><strong>Giới tính:</strong> @Model.Gender</p>
     <p><strong>Ngày sinh:</strong> @Model.DateOfBirth.ToShortDateString()</p>
     <p><strong>Số điện thoại:</strong> @Model.PhoneNumber</p>
-    <p><strong>Phòng:</strong> @Model.RoomId</p>
+    <p><strong>Phòng:</strong> @(Model.Room?.RoomNumber ?? "Không có")</p>
 </div>
 
 <form asp-action="DeleteConfirmed" method="post">
+    @Html.AntiForgeryToken()
     <input type="hidden" name="id" value="@Model.Id" />
     <button type="submit">Xóa</button>
     <a asp-action="Index">Hủy</a>

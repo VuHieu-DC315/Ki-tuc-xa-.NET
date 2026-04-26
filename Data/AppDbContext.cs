@@ -11,6 +11,7 @@ namespace kitucxa.Data
 
         public DbSet<Student> Student { get; set; }
         public DbSet<Room> Room { get; set; }
+        public DbSet<User> User { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -20,6 +21,8 @@ namespace kitucxa.Data
                 .HasOne(s => s.Room)
                 .WithMany(r => r.Students)
                 .HasForeignKey(s => s.RoomId);
+
+            modelBuilder.Entity<User>().ToTable("users");
         }
     }
 }
