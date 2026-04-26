@@ -1,0 +1,155 @@
+@model kitucxa.Models.ReportVm
+
+@{
+    ViewData["Title"] = "Báo cáo dữ liệu";
+
+    string filterType = ViewBag.FilterType ?? "day";
+    string selectedDate = ViewBag.SelectedDate ?? "";
+    string selectedMonth = ViewBag.SelectedMonth ?? "";
+    string selectedYear = ViewBag.SelectedYear ?? "";
+}
+
+<h2 class="mb-4">Báo cáo dữ liệu sinh viên</h2>
+
+<form method="get" asp-controller="Report" asp-action="Index" class="card p-3 mb-4">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label">Loại báo cáo</label>
+
+            <select name="filterType" id="filterType" class="form-select">
+                @if (filterType == "day")
+                {
+                    <option value="day" selected>Theo ngày</option>
+                }
+                else
+                {
+                    <option value="day">Theo ngày</option>
+                }
+
+                @if (filterType == "month")
+                {
+                    <option value="month" selected>Theo tháng</option>
+                }
+                else
+                {
+                    <option value="month">Theo tháng</option>
+                }
+
+                @if (filterType == "year")
+                {
+                    <option value="year" selected>Theo năm</option>
+                }
+                else
+                {
+                    <option value="year">Theo năm</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-3" id="dateBox">
+            <label class="form-label">Chọn ngày</label>
+            <input type="date"
+                   name="selectedDate"
+                   class="form-control"
+                   value="@selectedDate" />
+        </div>
+
+        <div class="col-md-3" id="monthBox">
+            <label class="form-label">Chọn tháng</label>
+            <input type="month"
+                   name="selectedMonth"
+                   class="form-control"
+                   value="@selectedMonth" />
+        </div>
+
+        <div class="col-md-3" id="yearBox">
+            <label class="form-label">Chọn năm</label>
+            <input type="number"
+                   name="selectedYear"
+                   class="form-control"
+                   min="2000"
+                   max="2100"
+                   value="@selectedYear"
+                   placeholder="Ví dụ: 2026" />
+        </div>
+
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary w-100">
+                Xem báo cáo
+            </button>
+        </div>
+    </div>
+</form>
+
+<div class="card p-3">
+    <h4 class="mb-3">
+        Kết quả báo cáo
+
+        @if (filterType == "day")
+        {
+            <span class="text-muted fs-6">theo ngày @selectedDate</span>
+        }
+        else if (filterType == "month")
+        {
+            <span class="text-muted fs-6">theo tháng @selectedMonth</span>
+        }
+        else if (filterType == "year")
+        {
+            <span class="text-muted fs-6">theo năm @selectedYear</span>
+        }
+    </h4>
+
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Nội dung</th>
+                <th>Số lượng</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+                <td>Tổng số sinh viên đăng kí</td>
+                <td>@Model.TotalRegisteredStudents</td>
+            </tr>
+
+            <tr>
+                <td>Tổng số sinh viên đã vào phòng</td>
+                <td>@Model.TotalJoinedRoomStudents</td>
+            </tr>
+
+            <tr>
+                <td>Tổng số sinh viên đã rời phòng hoặc chuyển phòng</td>
+                <td>@Model.TotalLeftOrTransferredStudents</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        function updateFilterInput() {
+            const filterType = document.getElementById("filterType").value;
+
+            document.getElementById("dateBox").style.display = "none";
+            document.getElementById("monthBox").style.display = "none";
+            document.getElementById("yearBox").style.display = "none";
+
+            if (filterType === "day") {
+                document.getElementById("dateBox").style.display = "block";
+            }
+
+            if (filterType === "month") {
+                document.getElementById("monthBox").style.display = "block";
+            }
+
+            if (filterType === "year") {
+                document.getElementById("yearBox").style.display = "block";
+            }
+        }
+
+        document.getElementById("filterType").addEventListener("change", updateFilterInput);
+
+        updateFilterInput();
+    </script>
+}

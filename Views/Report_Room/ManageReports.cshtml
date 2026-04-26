@@ -1,0 +1,89 @@
+@model List<kitucxa.Models.Report_Room>
+
+@{
+    ViewData["Title"] = "Quản lý báo cáo đổi phòng";
+}
+
+<h2>Quản lý báo cáo đổi phòng</h2>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>StudentId</th>
+            <th>OldRoomId</th>
+            <th>NewRoomId</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.StudentId</td>
+                    <td>@item.OldRoomId</td>
+                    <td>@item.NewRoomId</td>
+
+                    <td>
+                        @if (item.Status == "Pending")
+                        {
+                            <span class="badge bg-warning text-dark">Đang chờ</span>
+                        }
+                        else if (item.Status == "Confirm")
+                        {
+                            <span class="badge bg-success">Đã duyệt</span>
+                        }
+                        else if (item.Status == "Reject")
+                        {
+                            <span class="badge bg-danger">Đã từ chối</span>
+                        }
+                        else
+                        {
+                            <span>@item.Status</span>
+                        }
+                    </td>
+
+                    <td>
+                        @if (item.Status == "Pending")
+                        {
+                            <div class="d-flex gap-2">
+                                <form asp-controller="Report_Room" asp-action="UpdateStatus" method="post">
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <input type="hidden" name="status" value="Confirm" />
+
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        Duyệt
+                                    </button>
+                                </form>
+
+                                <form asp-controller="Report_Room" asp-action="UpdateStatus" method="post">
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <input type="hidden" name="status" value="Reject" />
+
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        Từ chối
+                                    </button>
+                                </form>
+                            </div>
+                        }
+                        else
+                        {
+                            <span>Đã xử lý</span>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="6" class="text-center">Chưa có báo cáo nào</td>
+            </tr>
+        }
+    </tbody>
+</table>

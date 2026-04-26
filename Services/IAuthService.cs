@@ -6,6 +6,6 @@ namespace kitucxa.Service
     {
         User? Login(string username, string password);
 
-        void Register(User user);
+        void Register(RegisterVm user);
     }
 }

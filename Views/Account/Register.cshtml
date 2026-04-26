@@ -1,4 +1,4 @@
-@model kitucxa.Models.User
+@model kitucxa.Models.RegisterVm
 
 @{
     ViewData["Title"] = "Đăng ký";
@@ -30,8 +30,6 @@
                     <input asp-for="Password" type="password" class="form-control" placeholder="Nhập mật khẩu" />
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
-
-                <input type="hidden" asp-for="Role" value="User" />
 
                 <button type="submit" class="btn btn-success w-100">Đăng ký</button>
             </form>

@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>@ViewData["Title"] - Ký túc xá</title>
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
@@ -10,63 +11,136 @@
     <link rel="stylesheet" href="~/kitucxa.styles.css" asp-append-version="true" />
 
     <style>
-        html {
-            font-size: 16px;
-        }
-
         body {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
             background-color: #f8f9fa;
-        }
-
-        main {
-            flex: 1;
         }
 
         .navbar-brand {
             font-weight: 700;
-            letter-spacing: 0.5px;
         }
 
         .page-wrapper {
-            background: #fff;
+            background: #ffffff;
             border-radius: 12px;
             padding: 24px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-        }
-
-        .footer-custom {
-            background-color: #ffffff;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
         }
     </style>
 </head>
+
 <body>
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
             <div class="container">
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">KTX Manager</a>
+                @if (User.Identity?.IsAuthenticated == true && User.IsInRole("User"))
+                {
+                    <a class="navbar-brand" asp-controller="Student" asp-action="Dashboard">
+                        KTX Manager
+                    </a>
+                }
+                else if (User.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
+                {
+                    <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                        KTX Manager
+                    </a>
+                }
+                else
+                {
+                    <a class="navbar-brand" asp-controller="Account" asp-action="Login">
+                        KTX Manager
+                    </a>
+                }
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
-                        aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#mainNavbar">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse" id="mainNavbar">
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0 me-3">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Student" asp-action="Index">Sinh viên</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Room" asp-action="Index">Phòng</a>
-                        </li>
-                    </ul>
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 me-3">
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Home" asp-action="Index">
+                                        Trang chủ
+                                    </a>
+                                </li>
 
-                    <div class="d-flex">
-                        <a class="btn btn-light btn-sm me-2" asp-controller="Student" asp-action="Create">+ Thêm sinh viên</a>
-                        <a class="btn btn-outline-light btn-sm" asp-controller="Room" asp-action="Create">+ Thêm phòng</a>
-                    </div>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Student" asp-action="Index">
+                                        Quản lý sinh viên
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Room" asp-action="Index">
+                                        Quản lý phòng
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Report" asp-action="Index">
+                                        Báo cáo
+                                    </a>
+                                </li>
+                            }
+                            else if (User.IsInRole("User"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Student" asp-action="Dashboard">
+                                        Trang sinh viên
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="text-white small">
+                                @User.Identity.Name
+                            </span>
+
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <a class="btn btn-light btn-sm"
+                                   asp-controller="Student"
+                                   asp-action="Create">
+                                    + Thêm sinh viên
+                                </a>
+
+                                <a class="btn btn-outline-light btn-sm"
+                                   asp-controller="Room"
+                                   asp-action="Create">
+                                    + Thêm phòng
+                                </a>
+                            }
+
+                            <a class="btn btn-outline-light btn-sm"
+                               asp-controller="Account"
+                               asp-action="Logout">
+                                Đăng xuất
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Login">
+                                    Đăng nhập
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Register">
+                                    Đăng ký
+                                </a>
+                            </li>
+                        </ul>
+                    }
                 </div>
             </div>
         </nav>
@@ -80,22 +154,16 @@
         </main>
     </div>
 
-    <footer class="border-top footer-custom text-muted py-3 mt-auto">
-        <div class="container d-flex justify-content-between align-items-center flex-wrap">
-            <div>
-                &copy; @DateTime.Now.Year - Hệ thống quản lý ký túc xá
-            </div>
-            <div>
-                <a class="text-decoration-none me-3" asp-controller="Home" asp-action="Index">KTX Manager</a>
-                <a class="text-decoration-none me-3" asp-controller="Student" asp-action="Index">Sinh viên</a>
-                <a class="text-decoration-none" asp-controller="Room" asp-action="Index">Phòng</a>
-            </div>
+    <footer class="border-top text-muted py-3 bg-white">
+        <div class="container">
+            &copy; @DateTime.Now.Year - Hệ thống quản lý ký túc xá
         </div>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

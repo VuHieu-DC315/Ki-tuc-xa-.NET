@@ -2,6 +2,8 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using kitucxa.Models;
 using kitucxa.Service;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace kitucxa.Controllers;
 
@@ -13,18 +15,21 @@ public class RoomController : Controller
         _roomService = roomService;
     }
 
+    [Authorize(Roles = "Admin")]
     public IActionResult Index()
     {
         var Room = _roomService.GetAll();
         return View(Room);
     }
 
+    [Authorize(Roles = "Admin")]
     public IActionResult Create()
     {
         return View();
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public IActionResult Create(Room room)
     {
         if (ModelState.IsValid)
@@ -35,6 +40,7 @@ public class RoomController : Controller
         return View(room);
     }
 
+    [Authorize(Roles = "Admin")]
     public IActionResult Edit(int id)
     {
         var room = _roomService.GetById(id);
@@ -46,6 +52,7 @@ public class RoomController : Controller
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public IActionResult Edit(Room room)
     {
         if (ModelState.IsValid)
@@ -56,6 +63,7 @@ public class RoomController : Controller
         return View(room);
     }
 
+    [Authorize(Roles = "Admin")]
     public IActionResult Delete(int id)
     {
         var room = _roomService.GetById(id);
@@ -67,6 +75,7 @@ public class RoomController : Controller
     }
 
     [HttpPost, ActionName("Delete")]
+    [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public IActionResult DeleteConfirmed(int id)
     {

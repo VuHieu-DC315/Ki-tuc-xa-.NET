@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using kitucxa.Models;
 using kitucxa.Service;
+using Microsoft.AspNetCore.Authorization;
 
 namespace kitucxa.Controllers
 {
@@ -21,12 +22,14 @@ namespace kitucxa.Controllers
             ViewBag.Rooms = new SelectList(_roomService.GetAll(), "Id", "RoomNumber", selectedRoom);
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult Index()
         {
             var students = _studentService.GetAll();
             return View(students);
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             LoadRooms();
@@ -34,7 +37,8 @@ namespace kitucxa.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        // [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create(Student student)
         {
             if (ModelState.IsValid)
@@ -54,6 +58,7 @@ namespace kitucxa.Controllers
             return View(student);
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult Edit(int id)
         {
             var student = _studentService.GetById(id);
@@ -67,7 +72,8 @@ namespace kitucxa.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        // [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public IActionResult Edit(int id, Student student)
         {
             if (id != student.Id)
@@ -92,6 +98,7 @@ namespace kitucxa.Controllers
             return View(student);
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
             var student = _studentService.GetById(id);
@@ -104,11 +111,32 @@ namespace kitucxa.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        // [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public IActionResult DeleteConfirmed(int id)
         {
             _studentService.Delete(id);
             return RedirectToAction(nameof(Index));
+        }
+
+        [Authorize(Roles = "User")]
+        public IActionResult Dashboard()
+        {
+            var studentIdValue = User.FindFirst("StudentId")?.Value;
+
+            if (!int.TryParse(studentIdValue, out int studentId))
+            {
+                return RedirectToAction("AccessDenied", "Account");
+            }
+
+            var model = _studentService.GetDashboard(studentId);
+
+            if (model == null)
+            {
+                return NotFound();
+            }
+
+            return View(model);
         }
     }
 }

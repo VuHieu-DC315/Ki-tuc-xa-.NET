@@ -17,9 +17,16 @@ namespace kitucxa.Service
             return _context.User.FirstOrDefault(u => u.Name == username && u.Password == password);
         }
 
-        public void Register(User user)
+        public void Register(RegisterVm user)
         {
-            _context.User.Add(user);
+            var userTamThoi = new User
+            {
+                Name = user.Name,
+                Email = user.Email,
+                Password = user.Password,
+                Role = "User"
+            };
+            _context.User.Add(userTamThoi);
             _context.SaveChanges();
         }
     }

@@ -1,0 +1,79 @@
+@model kitucxa.Models.Report_Room
+
+@{
+    ViewData["Title"] = "Gửi yêu cầu phòng";
+
+    string studentId = Context.Request.Query["StudentId"].ToString();
+    string oldRoomId = Context.Request.Query["OldRoomId"].ToString();
+    string newRoomId = Context.Request.Query["NewRoomId"].ToString();
+
+    bool isChangeRoom = !string.IsNullOrEmpty(oldRoomId);
+}
+
+<div class="container mt-4">
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <h3 class="mb-4">
+                @(isChangeRoom ? "Gửi yêu cầu đổi phòng" : "Gửi yêu cầu đăng kí phòng")
+            </h3>
+
+            <form asp-controller="Report_Room" asp-action="SendReport" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <label class="form-label">Mã sinh viên</label>
+                    <input name="StudentId"
+                           value="@studentId"
+                           class="form-control"
+                           readonly />
+                    <span asp-validation-for="StudentId" class="text-danger"></span>
+                </div>
+
+                @if (isChangeRoom)
+                {
+                    <div class="mb-3">
+                        <label class="form-label">Mã phòng hiện tại</label>
+                        <input name="OldRoomId"
+                               value="@oldRoomId"
+                               class="form-control"
+                               readonly />
+                        <span asp-validation-for="OldRoomId" class="text-danger"></span>
+                    </div>
+                }
+                else
+                {
+                    <input name="OldRoomId" type="hidden" value="" />
+                }
+
+                <div class="mb-3">
+                    <label class="form-label">
+                        @(isChangeRoom ? "Mã phòng muốn chuyển đến" : "Mã phòng muốn đăng kí")
+                    </label>
+                    <input name="NewRoomId"
+                           value="@newRoomId"
+                           class="form-control"
+                           readonly />
+                    <span asp-validation-for="NewRoomId" class="text-danger"></span>
+                </div>
+
+                <input name="Status" type="hidden" value="Pending" />
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        Gửi yêu cầu
+                    </button>
+
+                    <a asp-controller="Student"
+                       asp-action="Dashboard"
+                       class="btn btn-secondary">
+                        Quay lại
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

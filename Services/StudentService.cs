@@ -45,6 +45,10 @@ namespace kitucxa.Service
 
             _context.Student.Add(student);
             _context.SaveChanges();
+
+            AddRoomHistory(student.Id, null, student.RoomId, "JoinRoom");
+
+            _context.SaveChanges();
         }
 
         public void Update(Student student)
@@ -73,6 +77,8 @@ namespace kitucxa.Service
                 {
                     throw new InvalidOperationException("Phòng đã đầy, không thể chuyển sinh viên vào phòng này.");
                 }
+
+                AddRoomHistory(student.Id, existingStudent.RoomId, student.RoomId, "TransferRoom");
             }
 
             _context.Student.Update(student);
@@ -82,11 +88,55 @@ namespace kitucxa.Service
         public void Delete(int id)
         {
             var student = _context.Student.Find(id);
+
             if (student != null)
             {
+                AddRoomHistory(student.Id, student.RoomId, null, "LeaveRoom");
+
                 _context.Student.Remove(student);
                 _context.SaveChanges();
             }
+        }
+
+        
+        private void AddRoomHistory(int studentId, int? oldRoomId, int? newRoomId, string actionType)
+        {
+            var history = new StudentRoomHistory
+            {
+                StudentId = studentId,
+                OldRoomId = oldRoomId,
+                NewRoomId = newRoomId,
+                ActionType = actionType,
+                CreatedAt = DateTime.Now
+            };
+
+            _context.StudentRoomHistories.Add(history);
+        }
+        
+        // thao tác của sinh viên
+        public StudentDashboardVm? GetDashboard(int studentId)
+        {
+            var student = _context.Student
+                .Include(s => s.Room)
+                .FirstOrDefault(s => s.Id == studentId);
+
+            if (student == null)
+            {
+                return null;
+            }
+
+            var rooms = _context.Room
+                .Include(r => r.Students)
+                .ToList();
+
+            var model = new StudentDashboardVm
+            {
+                Student = student,
+                MyRoom = student.Room,
+                Rooms = rooms
+            };
+
+            return model;
         }
     }
 }

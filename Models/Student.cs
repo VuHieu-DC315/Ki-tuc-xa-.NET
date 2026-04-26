@@ -20,5 +20,7 @@ namespace kitucxa.Models
         public int RoomId { get; set; }
 
         public Room? Room { get; set; }
+
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

@@ -37,9 +37,13 @@ namespace kitucxa.Controllers
             {
                 new Claim(ClaimTypes.Name, user.Name),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role)
+                new Claim(ClaimTypes.Role, user.Role),
+                new Claim("UserId", user.Id.ToString())
             };
-
+            if (user.StudentId != null)
+            {
+                claims.Add(new Claim("StudentId", user.StudentId.Value.ToString()));
+            }
             var identity = new ClaimsIdentity(
                 claims,
                 CookieAuthenticationDefaults.AuthenticationScheme
@@ -51,7 +55,20 @@ namespace kitucxa.Controllers
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 principal
             );
-            return RedirectToAction("Index", "Home");
+            if (user.Role == "Admin")
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            else if (user.Role == "User")
+            {
+                if (user.StudentId == null)
+                {
+                    ModelState.AddModelError("", "Tài khoản này chưa được liên kết với sinh viên.");
+                    return View();
+                }
+                return RedirectToAction("Dashboard", "Student", new { id = user.StudentId });
+            }
+            return RedirectToAction("AccessDenied", "Account");
         }
 
         public IActionResult Register()
@@ -60,17 +77,21 @@ namespace kitucxa.Controllers
         }
 
         [HttpPost]
-        public IActionResult Register(User user)
+        public IActionResult Register(RegisterVm user)
         {
             if (ModelState.IsValid)
             {
                 _authService.Register(user);
-                ModelState.AddModelError("", "Registration successful. Please log in.");
+                TempData["SuccessMessage"] = "Đăng ký tài khoản thành công. Vui lòng đăng nhập.";
                 return View();
             }
             return View(user);
         }
 
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
