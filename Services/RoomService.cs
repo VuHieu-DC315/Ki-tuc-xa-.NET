@@ -1,5 +1,6 @@
 using kitucxa.Data;
 using kitucxa.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace kitucxa.Service
 {
@@ -49,6 +50,15 @@ namespace kitucxa.Service
                 _context.Room.Remove(room);
                 _context.SaveChanges();
             }
+        }
+
+        public Room? GetRoomWithStudentsById(int id)
+        {
+            var room = _context.Room
+                .Include(r => r.Students)
+                .FirstOrDefault(r => r.Id == id);
+
+            return room;
         }
     }
 }

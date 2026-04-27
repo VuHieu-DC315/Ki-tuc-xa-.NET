@@ -9,5 +9,6 @@ namespace kitucxa.Service
         void Add(Room room);
         void Update(Room room);
         void Delete(int id);
+        Room? GetRoomWithStudentsById(int id);
     }
 }

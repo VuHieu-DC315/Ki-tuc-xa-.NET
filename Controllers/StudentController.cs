@@ -19,21 +19,45 @@ namespace kitucxa.Controllers
 
         private void LoadRooms(object? selectedRoom = null)
         {
-            ViewBag.Rooms = new SelectList(_roomService.GetAll(), "Id", "RoomNumber", selectedRoom);
+            try
+            {
+                ViewBag.Rooms = new SelectList(_roomService.GetAll(), "Id", "RoomNumber", selectedRoom);
+            }
+            catch
+            {
+                ViewBag.Rooms = new SelectList(new List<Room>(), "Id", "RoomNumber", selectedRoom);
+            }
         }
 
         [Authorize(Roles = "Admin")]
         public IActionResult Index()
         {
-            var students = _studentService.GetAll();
-            return View(students);
+            try
+            {
+                var students = _studentService.GetAll();
+                return View(students);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                return View(new List<Student>());
+            }
         }
 
         [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
-            LoadRooms();
-            return View();
+            try
+            {
+                LoadRooms();
+                return View();
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                LoadRooms();
+                return View();
+            }
         }
 
         [HttpPost]
@@ -41,34 +65,52 @@ namespace kitucxa.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Create(Student student)
         {
-            if (ModelState.IsValid)
+            try
             {
-                try
+                if (ModelState.IsValid)
                 {
                     _studentService.Add(student);
+                    TempData["SuccessMessage"] = "Thêm sinh viên thành công.";
                     return RedirectToAction(nameof(Index));
                 }
-                catch (InvalidOperationException ex)
-                {
-                    ModelState.AddModelError("", ex.Message);
-                }
-            }
 
-            LoadRooms(student.RoomId);
-            return View(student);
+                LoadRooms(student.RoomId);
+                return View(student);
+            }
+            catch (InvalidOperationException ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                LoadRooms(student.RoomId);
+                return View(student);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Đã xảy ra lỗi khi thêm sinh viên: " + ex.Message);
+                LoadRooms(student.RoomId);
+                return View(student);
+            }
         }
 
         [Authorize(Roles = "Admin")]
         public IActionResult Edit(int id)
         {
-            var student = _studentService.GetById(id);
-            if (student == null)
+            try
             {
-                return NotFound();
-            }
+                var student = _studentService.GetById(id);
 
-            LoadRooms(student.RoomId);
-            return View(student);
+                if (student == null)
+                {
+                    return NotFound();
+                }
+
+                LoadRooms(student.RoomId);
+                return View(student);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         [HttpPost]
@@ -76,38 +118,56 @@ namespace kitucxa.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Edit(int id, Student student)
         {
-            if (id != student.Id)
+            try
             {
-                return NotFound();
-            }
+                if (id != student.Id)
+                {
+                    return NotFound();
+                }
 
-            if (ModelState.IsValid)
-            {
-                try
+                if (ModelState.IsValid)
                 {
                     _studentService.Update(student);
+                    TempData["SuccessMessage"] = "Cập nhật sinh viên thành công.";
                     return RedirectToAction(nameof(Index));
                 }
-                catch (InvalidOperationException ex)
-                {
-                    ModelState.AddModelError("", ex.Message);
-                }
-            }
 
-            LoadRooms(student.RoomId);
-            return View(student);
+                LoadRooms(student.RoomId);
+                return View(student);
+            }
+            catch (InvalidOperationException ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                LoadRooms(student.RoomId);
+                return View(student);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Đã xảy ra lỗi khi cập nhật sinh viên: " + ex.Message);
+                LoadRooms(student.RoomId);
+                return View(student);
+            }
         }
 
         [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
-            var student = _studentService.GetById(id);
-            if (student == null)
+            try
             {
-                return NotFound();
-            }
+                var student = _studentService.GetById(id);
 
-            return View(student);
+                if (student == null)
+                {
+                    return NotFound();
+                }
+
+                return View(student);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         [HttpPost]
@@ -115,28 +175,50 @@ namespace kitucxa.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult DeleteConfirmed(int id)
         {
-            _studentService.Delete(id);
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                _studentService.Delete(id);
+                TempData["SuccessMessage"] = "Xóa sinh viên thành công.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Đã xảy ra lỗi khi xóa sinh viên: " + ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         [Authorize(Roles = "User")]
         public IActionResult Dashboard()
         {
-            var studentIdValue = User.FindFirst("StudentId")?.Value;
-
-            if (!int.TryParse(studentIdValue, out int studentId))
+            try
             {
+                var studentIdValue = User.FindFirst("StudentId")?.Value;
+
+                if (!int.TryParse(studentIdValue, out int studentId))
+                {
+                    return RedirectToAction("AccessDenied", "Account");
+                }
+
+                var model = _studentService.GetDashboard(studentId);
+
+                if (model == null)
+                {
+                    return NotFound();
+                }
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
                 return RedirectToAction("AccessDenied", "Account");
             }
-
-            var model = _studentService.GetDashboard(studentId);
-
-            if (model == null)
-            {
-                return NotFound();
-            }
-
-            return View(model);
         }
     }
 }

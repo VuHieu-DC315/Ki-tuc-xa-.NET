@@ -7,6 +7,7 @@ namespace kitucxa.Service
         void SendReport_Room(Report_Room reportRoom);
 
         List<Report_Room> GetAll();
+
         void UpdateStatus(int id, string status);
     }
 }

@@ -1,0 +1,61 @@
+@model kitucxa.Models.Room
+
+@{
+    ViewData["Title"] = "Thông tin phòng";
+}
+
+<div class="container mt-4">
+    <h2>Thông tin phòng</h2>
+
+    <table class="table table-bordered mt-3">
+        <tr>
+            <th>Mã phòng</th>
+            <td>@Model.Id</td>
+        </tr>
+        <tr>
+            <th>Số phòng</th>
+            <td>@Model.RoomNumber</td>
+        </tr>
+        <tr>
+            <th>Sức chứa</th>
+            <td>@Model.Capacity</td>
+        </tr>
+        <tr>
+            <th>Số sinh viên hiện tại</th>
+            <td>@Model.Students.Count</td>
+        </tr>
+    </table>
+
+    <h4 class="mt-4">Danh sách sinh viên trong phòng</h4>
+
+    @if (Model.Students == null || Model.Students.Count == 0)
+    {
+        <div class="alert alert-info">
+            Phòng này hiện chưa có sinh viên.
+        </div>
+    }
+    else
+    {
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Họ tên</th>
+                    <th>Giới tính</th>
+                    <th>Ngày sinh</th>
+                    <th>Số điện thoại</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var student in Model.Students)
+                {
+                    <tr>
+                        <td>@student.FullName</td>
+                        <td>@student.Gender</td>
+                        <td>@student.DateOfBirth.ToString("dd/MM/yyyy")</td>
+                        <td>@student.PhoneNumber</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

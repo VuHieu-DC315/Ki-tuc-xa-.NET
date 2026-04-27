@@ -6,6 +6,20 @@
 
 <h2>Quản lý báo cáo đổi phòng</h2>
 
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
 <table class="table table-bordered table-striped">
     <thead>
         <tr>
@@ -53,6 +67,8 @@
                         {
                             <div class="d-flex gap-2">
                                 <form asp-controller="Report_Room" asp-action="UpdateStatus" method="post">
+                                    @Html.AntiForgeryToken()
+
                                     <input type="hidden" name="id" value="@item.Id" />
                                     <input type="hidden" name="status" value="Confirm" />
 
@@ -62,6 +78,8 @@
                                 </form>
 
                                 <form asp-controller="Report_Room" asp-action="UpdateStatus" method="post">
+                                    @Html.AntiForgeryToken()
+
                                     <input type="hidden" name="id" value="@item.Id" />
                                     <input type="hidden" name="status" value="Reject" />
 

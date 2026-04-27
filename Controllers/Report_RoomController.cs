@@ -5,7 +5,6 @@ using kitucxa.Models;
 
 namespace kitucxa.Controllers
 {
-    
     public class Report_RoomController : Controller
     {
         private readonly IReport_RoomService _reportRoomService;
@@ -23,29 +22,67 @@ namespace kitucxa.Controllers
 
         [HttpPost]
         [Authorize(Roles = "User")]
+        [ValidateAntiForgeryToken]
         public IActionResult SendReport(Report_Room reportRoom)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _reportRoomService.SendReport_Room(reportRoom);
-                return RedirectToAction("Dashboard", "Student");
-            }
+                if (ModelState.IsValid)
+                {
+                    _reportRoomService.SendReport_Room(reportRoom);
+                    TempData["Success"] = "Gửi yêu cầu đổi phòng thành công.";
+                    return RedirectToAction("Dashboard", "Student");
+                }
 
-            return View("Index", reportRoom);
+                return View("Index", reportRoom);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                return View("Index", reportRoom);
+            }
         }
 
         [Authorize(Roles = "Admin")]
         public IActionResult ManageReports()
         {
-            var reports = _reportRoomService.GetAll();
-            return View(reports);
+            try
+            {
+                var reports = _reportRoomService.GetAll();
+                return View(reports);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                return View(new List<Report_Room>());
+            }
         }
 
+        [HttpPost]
         [Authorize(Roles = "Admin")]
+        [ValidateAntiForgeryToken]
         public IActionResult UpdateStatus(int id, string status)
         {
-            _reportRoomService.UpdateStatus(id, status);
-            return RedirectToAction("ManageReports");
+            try
+            {
+                _reportRoomService.UpdateStatus(id, status);
+
+                if (status == "Confirm")
+                {
+                    TempData["Success"] = "Đã duyệt yêu cầu thành công.";
+                }
+                else if (status == "Reject")
+                {
+                    TempData["Success"] = "Đã từ chối yêu cầu thành công.";
+                }
+
+                return RedirectToAction("ManageReports");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("ManageReports");
+            }
         }
     }
 }
