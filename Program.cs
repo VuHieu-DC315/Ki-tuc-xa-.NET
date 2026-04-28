@@ -32,14 +32,23 @@ if (OperatingSystem.IsWindows())
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
-    var configuration = builder.Configuration.GetConnectionString("Redis");
+    var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
 
-    if (string.IsNullOrEmpty(configuration))
+    if (string.IsNullOrEmpty(redisConnectionString))
     {
-        configuration = "127.0.0.1:6379,abortConnect=false,connectRetry=5,connectTimeout=10000,syncTimeout=10000";
+        redisConnectionString = "127.0.0.1:6379";
     }
 
-    return ConnectionMultiplexer.Connect(configuration);
+    var options = ConfigurationOptions.Parse(redisConnectionString);
+
+    options.AbortOnConnectFail = false;
+    options.ConnectRetry = 1;
+    options.ConnectTimeout = 1000;
+    options.SyncTimeout = 1000;
+    options.AsyncTimeout = 1000;
+    options.KeepAlive = 10;
+
+    return ConnectionMultiplexer.Connect(options);
 });
 
 builder.Services.AddScoped<IStudentService, StudentService>();

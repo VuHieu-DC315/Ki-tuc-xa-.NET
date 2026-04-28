@@ -19,74 +19,95 @@ namespace kitucxa.Service
 
         public async Task<bool> IsBlockedAsync(string username, string ipAddress)
         {
-            var db = _redis.GetDatabase();
+            try
+            {
+                if (!_redis.IsConnected)
+                {
+                    return false;
+                }
 
-            string blockKey = GetBlockKey(username, ipAddress);
+                var db = _redis.GetDatabase();
 
-            bool isBlocked = await db.KeyExistsAsync(blockKey);
+                string blockKey = GetBlockKey(username, ipAddress);
 
-            return isBlocked;
+                bool isBlocked = await db.KeyExistsAsync(blockKey);
+
+                return isBlocked;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public async Task<int> RecordFailedAttemptAsync(string username, string ipAddress)
         {
-            var db = _redis.GetDatabase();
-
-            string failKey = GetFailKey(username, ipAddress);
-            string blockKey = GetBlockKey(username, ipAddress);
-
-            long failedCount = await db.StringIncrementAsync(failKey);
-
-            if (failedCount == 1)
+            try
             {
-                await db.KeyExpireAsync(failKey, FailedAttemptWindow);
-            }
+                if (!_redis.IsConnected)
+                {
+                    return 0;
+                }
 
-            if (failedCount >= MaxFailedAttempts)
+                var db = _redis.GetDatabase();
+
+                string failKey = GetFailKey(username, ipAddress);
+
+                long failedAttempts = await db.StringIncrementAsync(failKey);
+
+                if (failedAttempts == 1)
+                {
+                    await db.KeyExpireAsync(failKey, FailedAttemptWindow);
+                }
+
+                if (failedAttempts >= MaxFailedAttempts)
+                {
+                    string blockKey = GetBlockKey(username, ipAddress);
+
+                    await db.StringSetAsync(blockKey, "blocked", BlockDuration);
+
+                    await db.KeyDeleteAsync(failKey);
+                }
+
+                return (int)failedAttempts;
+            }
+            catch
             {
-                await db.StringSetAsync(blockKey, "blocked", BlockDuration);
-
-                await db.KeyDeleteAsync(failKey);
+                return 0;
             }
-
-            return (int)failedCount;
         }
 
         public async Task ResetFailedAttemptsAsync(string username, string ipAddress)
         {
-            var db = _redis.GetDatabase();
+            try
+            {
+                if (!_redis.IsConnected)
+                {
+                    return;
+                }
 
-            string failKey = GetFailKey(username, ipAddress);
-            string blockKey = GetBlockKey(username, ipAddress);
+                var db = _redis.GetDatabase();
 
-            await db.KeyDeleteAsync(failKey);
-            await db.KeyDeleteAsync(blockKey);
+                string failKey = GetFailKey(username, ipAddress);
+                string blockKey = GetBlockKey(username, ipAddress);
+
+                await db.KeyDeleteAsync(failKey);
+                await db.KeyDeleteAsync(blockKey);
+            }
+            catch
+            {
+                return;
+            }
         }
 
         private string GetFailKey(string username, string ipAddress)
         {
-            username = NormalizeUsername(username);
-            ipAddress = NormalizeIpAddress(ipAddress);
-
             return $"login:fail:{username}:{ipAddress}";
         }
 
         private string GetBlockKey(string username, string ipAddress)
         {
-            username = NormalizeUsername(username);
-            ipAddress = NormalizeIpAddress(ipAddress);
-
             return $"login:block:{username}:{ipAddress}";
-        }
-
-        private string NormalizeUsername(string username)
-        {
-            return username.Trim().ToLower();
-        }
-
-        private string NormalizeIpAddress(string ipAddress)
-        {
-            return ipAddress.Trim();
         }
     }
 }
