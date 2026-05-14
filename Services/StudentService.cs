@@ -13,11 +13,21 @@ namespace kitucxa.Service
             _context = context;
         }
 
-        public List<Student> GetAll()
+        public async Task<List<StudentListItemDto>> GetAllStudent(int page, int pageSize)
         {
-            return _context.Student
-                .Include(s => s.Room)
-                .ToList();
+            return await _context.Student
+                .AsNoTracking()
+                .OrderBy(s => s.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(s => new StudentListItemDto
+                {
+                    Id = s.Id,
+                    FullName = s.FullName,
+                    PhoneNumber = s.PhoneNumber,
+                    RoomNumber = s.Room != null ? s.Room.RoomNumber : ""
+                })
+            .ToListAsync();
         }
 
         public Student? GetById(int id)
@@ -98,7 +108,7 @@ namespace kitucxa.Service
             }
         }
 
-        
+
         private void AddRoomHistory(int studentId, int? oldRoomId, int? newRoomId, string actionType)
         {
             var history = new StudentRoomHistory
@@ -112,7 +122,7 @@ namespace kitucxa.Service
 
             _context.StudentRoomHistories.Add(history);
         }
-        
+
         // thao tác của sinh viên
         public StudentDashboardVm? GetDashboard(int studentId)
         {

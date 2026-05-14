@@ -1,37 +1,53 @@
-@model List<kitucxa.Models.Room>
+@model List<kitucxa.Models.RoomListItemDto>
 
 @{
     ViewData["Title"] = "Danh sách phòng";
 }
+
 @if (TempData["ErrorMessage"] != null)
 {
     <p style="color:red">@TempData["ErrorMessage"]</p>
 }
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <p style="color:green">@TempData["SuccessMessage"]</p>
+}
+
 <h2>Danh sách phòng</h2>
 
 <p>
     <a asp-action="Create" class="btn btn-primary">Thêm phòng</a>
 </p>
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Số phòng</th>
-            <th>Sức chứa</th>
-            <th>Thao tác</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var room in Model)
-        {
+@if (Model == null || Model.Count == 0)
+{
+    <p>Chưa có phòng nào.</p>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
             <tr>
-                <td>@room.RoomNumber</td>
-                <td>@room.Capacity</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@room.Id" class="btn btn-warning btn-sm">Sửa</a>
-                    <a asp-action="Delete" asp-route-id="@room.Id" class="btn btn-danger btn-sm">Xóa</a>
-                </td>
+                <th>Số phòng</th>
+                <th>Sức chứa</th>
+                <th>Số sinh viên hiện tại</th>
+                <th>Thao tác</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var room in Model)
+            {
+                <tr>
+                    <td>@room.RoomNumber</td>
+                    <td>@room.Capacity</td>
+                    <td>@room.CurrentStudentCount</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@room.Id" class="btn btn-warning btn-sm">Sửa</a>
+                        <a asp-action="Delete" asp-route-id="@room.Id" class="btn btn-danger btn-sm">Xóa</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

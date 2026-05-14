@@ -19,17 +19,19 @@ public class RoomController : Controller
     }
 
     [Authorize(Roles = "Admin")]
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
         try
         {
-            var rooms = _roomService.GetAll();
+            var rooms = await _roomService.GetAllCachedAsync();
+
             return View(rooms);
         }
         catch (Exception ex)
         {
             TempData["ErrorMessage"] = ex.Message;
-            return View(new List<Room>());
+
+            return View(new List<RoomListItemDto>());
         }
     }
 
@@ -59,6 +61,7 @@ public class RoomController : Controller
         catch (Exception ex)
         {
             TempData["ErrorMessage"] = ex.Message;
+
             return RedirectToAction("Dashboard", "Student");
         }
     }
@@ -73,6 +76,7 @@ public class RoomController : Controller
         catch (Exception ex)
         {
             TempData["ErrorMessage"] = ex.Message;
+
             return RedirectToAction(nameof(Index));
         }
     }
@@ -86,7 +90,9 @@ public class RoomController : Controller
             if (ModelState.IsValid)
             {
                 _roomService.Add(room);
+
                 TempData["SuccessMessage"] = "Thêm phòng thành công.";
+
                 return RedirectToAction(nameof(Index));
             }
 
@@ -95,11 +101,13 @@ public class RoomController : Controller
         catch (InvalidOperationException ex)
         {
             ModelState.AddModelError("", ex.Message);
+
             return View(room);
         }
         catch (Exception ex)
         {
             ModelState.AddModelError("", "Đã xảy ra lỗi khi thêm phòng: " + ex.Message);
+
             return View(room);
         }
     }
@@ -121,6 +129,7 @@ public class RoomController : Controller
         catch (Exception ex)
         {
             TempData["ErrorMessage"] = ex.Message;
+
             return RedirectToAction(nameof(Index));
         }
     }
@@ -134,7 +143,9 @@ public class RoomController : Controller
             if (ModelState.IsValid)
             {
                 _roomService.Update(room);
+
                 TempData["SuccessMessage"] = "Cập nhật phòng thành công.";
+
                 return RedirectToAction(nameof(Index));
             }
 
@@ -143,11 +154,13 @@ public class RoomController : Controller
         catch (InvalidOperationException ex)
         {
             ModelState.AddModelError("", ex.Message);
+
             return View(room);
         }
         catch (Exception ex)
         {
             ModelState.AddModelError("", "Đã xảy ra lỗi khi cập nhật phòng: " + ex.Message);
+
             return View(room);
         }
     }
@@ -169,6 +182,7 @@ public class RoomController : Controller
         catch (Exception ex)
         {
             TempData["ErrorMessage"] = ex.Message;
+
             return RedirectToAction(nameof(Index));
         }
     }
@@ -181,17 +195,21 @@ public class RoomController : Controller
         try
         {
             _roomService.Delete(id);
+
             TempData["SuccessMessage"] = "Xóa phòng thành công.";
+
             return RedirectToAction(nameof(Index));
         }
         catch (InvalidOperationException ex)
         {
             TempData["ErrorMessage"] = ex.Message;
+
             return RedirectToAction(nameof(Index));
         }
         catch (Exception ex)
         {
             TempData["ErrorMessage"] = "Đã xảy ra lỗi khi xóa phòng: " + ex.Message;
+
             return RedirectToAction(nameof(Index));
         }
     }

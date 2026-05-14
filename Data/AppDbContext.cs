@@ -24,6 +24,12 @@ namespace kitucxa.Data
                 .WithMany(r => r.Students)
                 .HasForeignKey(s => s.RoomId);
 
+            modelBuilder.Entity<Student>()
+                .HasIndex(s => s.RoomId)
+                .HasDatabaseName("IX_Student_RoomId");
+
+            
+
             modelBuilder.Entity<Report_Room>().ToTable("reportroom");
 
             modelBuilder.Entity<Report_Room>()

@@ -5,7 +5,7 @@ namespace kitucxa.Service
     public interface IStudentService
     {
         // thao tác của admin
-        List<Student> GetAll();
+        Task<List<StudentListItemDto>> GetAllStudent(int page, int pageSize);
         Student? GetById(int id);
         void Add(Student student);
         void Update(Student student);

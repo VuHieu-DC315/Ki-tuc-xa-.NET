@@ -30,17 +30,19 @@ namespace kitucxa.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        public IActionResult Index()
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 50)
         {
             try
             {
-                var students = _studentService.GetAll();
+                var students = await _studentService.GetAllStudent(page, pageSize);
+
                 return View(students);
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = ex.Message;
-                return View(new List<Student>());
+
+                return View(new List<StudentListItemDto>());
             }
         }
 

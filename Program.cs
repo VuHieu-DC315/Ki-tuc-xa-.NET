@@ -1,5 +1,6 @@
 using kitucxa.Data;
 using kitucxa.Service;
+using kitucxa.Service.Cache;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using StackExchange.Redis;
@@ -15,6 +16,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySQL(connectionString));
 
+// Khởi động Redis trong WSL nếu đang chạy trên Windows
 if (OperatingSystem.IsWindows())
 {
     var startRedis = new ProcessStartInfo
@@ -30,6 +32,7 @@ if (OperatingSystem.IsWindows())
     Thread.Sleep(1500);
 }
 
+// Đăng ký Redis connection
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
     var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
@@ -51,6 +54,10 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
     return ConnectionMultiplexer.Connect(options);
 });
 
+// Đăng ký Cache Service dùng Redis
+builder.Services.AddScoped<ICacheService, RedisCacheService>();
+
+// Đăng ký các Service của project
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
