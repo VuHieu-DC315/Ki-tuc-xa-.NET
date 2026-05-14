@@ -6,7 +6,7 @@ namespace kitucxa.Service
     {
         // thao tác của admin
         Task<List<StudentListItemDto>> GetAllStudent(int page, int pageSize);
-        Student? GetById(int id);
+        Task<Student>? GetById(int id);
         void Add(Student student);
         void Update(Student student);
         void Delete(int id);

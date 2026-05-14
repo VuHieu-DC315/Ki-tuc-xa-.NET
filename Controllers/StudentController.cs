@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using kitucxa.Models;
 using kitucxa.Service;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using kitucxa.Data;
 
 namespace kitucxa.Controllers
 {
@@ -10,11 +12,13 @@ namespace kitucxa.Controllers
     {
         private readonly IStudentService _studentService;
         private readonly IRoomService _roomService;
+        private readonly AppDbContext _context;
 
-        public StudentController(IStudentService studentService, IRoomService roomService)
+        public StudentController(IStudentService studentService, IRoomService roomService, AppDbContext context)
         {
             _studentService = studentService;
             _roomService = roomService;
+            _context = context;
         }
 
         private void LoadRooms(object? selectedRoom = null)
@@ -94,11 +98,11 @@ namespace kitucxa.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
             try
             {
-                var student = _studentService.GetById(id);
+                var student = await _studentService.GetById(id);
 
                 if (student == null)
                 {
@@ -116,9 +120,9 @@ namespace kitucxa.Controllers
         }
 
         [HttpPost]
-        // [ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public IActionResult Edit(int id, Student student)
+        public async Task<IActionResult> Edit(int id, Student student)
         {
             try
             {
@@ -129,7 +133,12 @@ namespace kitucxa.Controllers
 
                 if (ModelState.IsValid)
                 {
+                    using var transaction = await _context.Database.BeginTransactionAsync();
+
                     _studentService.Update(student);
+
+                    await transaction.CommitAsync();
+
                     TempData["SuccessMessage"] = "Cập nhật sinh viên thành công.";
                     return RedirectToAction(nameof(Index));
                 }
@@ -150,7 +159,6 @@ namespace kitucxa.Controllers
                 return View(student);
             }
         }
-
         [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
